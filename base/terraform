@@ -1,0 +1,38 @@
+provider "aws" {
+  version = "~> 3.0"
+  access_key = "AKIAW6XWCYYATIPWLWH3"
+  secret_key = "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"
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "base" {
+  ami = "ami-08e0ca9924195beba"
+  instance_type = "t2.micro"
+  key_name   = "rskr"
+
+tags = {
+  Name= "mytest"
+}
+}
+
+resource "aws_eip_association" "aws_eip" {
+  instance_id= aws_instance.base.id
+  allocation_id = aws_eip.lb.id
+}
+
+resource "aws_eip" "lb" {
+  vpc = true
+}
+
+output "webid" {
+  value= aws_instance.base.id
+}
+
+output "publicip" {
+  value= aws_instance.base.public_ip
+}
+
+output "eip" {
+  value= aws_eip.lb.public_ip
+}
+
