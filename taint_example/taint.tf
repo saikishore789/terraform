@@ -1,13 +1,15 @@
 provider "aws" {
-  version = "~> 3.0"
-  access_key = "AKIAW6XWCYYARMH2WFB2"
-  secret_key = "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"
+ 
   region = "ap-south-1"
 }
 
 resource "aws_instance" "base" {
-  ami = "ami-08e0ca9924195beba"
+  ami = "ami-0f5ee92e2d63afc18"
   instance_type = "t2.micro"
-  key_name   = "rskr"
+  key_name   = "rsk"
+
+  tags = {
+	Name = "Taint"
+}
 
 }
