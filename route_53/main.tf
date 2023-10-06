@@ -52,7 +52,7 @@ resource "aws_route53_record" "sample" {
   records = ["13.233.157.199"]
 } */
 
-resource "aws_route53_zone" "example" {
+/* resource "aws_route53_zone" "example" {
   name = "sai.example1.com"
 }
 
@@ -69,7 +69,16 @@ resource "aws_route53_record" "example" {
     aws_route53_zone.example.name_servers[2],
     aws_route53_zone.example.name_servers[3],
   ]
-}
+} */
 
+resource "aws_route53_health_check" "example" {
+  failure_threshold = "5"
+  fqdn              = "example.com"
+  port              = 443
+  request_interval  = "30"
+  resource_path     = "/"
+  search_string     = "example"
+  type              = "HTTPS_STR_MATCH"
+}
 
 
