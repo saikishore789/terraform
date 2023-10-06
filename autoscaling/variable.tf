@@ -11,7 +11,7 @@ variable "public_key_path" {
 }
 variable "key_name" {
   description = "Key name for SSHing into EC2"
-  default = "sai"
+  default = "rsk"
 }
 variable "amiid" {
   description = "Base ami to launch the instances"
