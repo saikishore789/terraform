@@ -7,12 +7,12 @@ variable "vpc_cidr" {
 }
 
 variable "subnets_cidr" {
-  type    = "list"
+  type    = list(string)
   default = ["10.20.1.0/24", "10.20.2.0/24"]
 }
 
 variable "azs" {
-  type    = "list"
+  type    = list(string)
   default = ["ap-south-1a", "ap-south-1b"]
 }
 
@@ -27,5 +27,5 @@ variable "number_instances" {
   default = "1"
 }
 variable "key" {
-  default = "feb-mum"
+  default = "rsk"
 }
