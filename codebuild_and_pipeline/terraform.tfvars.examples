@@ -1,0 +1,7 @@
+region = "ap-south-1"
+
+state_bucket = "globo-18935"
+
+dynamodb_table_name = "globo-tfstatelock-18935"
+
+code_commit_user = "sai"
