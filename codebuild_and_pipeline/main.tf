@@ -224,7 +224,7 @@ resource "aws_codebuild_project" "build_project" {
     location = aws_codecommit_repository.vpc_code.clone_url_http
   }
 
-  source_version = "main"
+  source_version = "master"
 }
 
 ###################################################
