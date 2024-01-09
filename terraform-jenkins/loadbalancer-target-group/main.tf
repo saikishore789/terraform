@@ -14,6 +14,7 @@ resource "aws_lb_target_group" "dev_proj_1_lb_target_group" {
   name = var.lb_target_group_name
   port = var.lb_target_group_port
   protocol = var.lb_target_group_protocol
+  vpc_id = var.vpc_id
 
   health_check {
     path = "/login"
