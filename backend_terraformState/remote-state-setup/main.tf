@@ -138,3 +138,4 @@ output "s3_bucket" {
 output "dynamodb_statelock" {
   value = aws_dynamodb_table.terraform_statelock.name
 }
+
