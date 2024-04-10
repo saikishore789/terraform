@@ -5,34 +5,38 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
   })
 }
 
-resource "aws_elb" "myapp-elb" {
-  name = "myapp-elb"
-  listener {
-    instance_port     = 3000
-    instance_protocol = "http"
-    lb_port           = 80
-    lb_protocol       = "http"
-  }
-
-  health_check {
-    healthy_threshold   = 3
-    unhealthy_threshold = 3
-    timeout             = 30
-    target              = "HTTP:3000/"
-    interval            = 60
-  }
-
-  cross_zone_load_balancing = true
-  idle_timeout = 400
-  connection_draining = true
-  connection_draining_timeout = 400
-
-  subnets = [aws_subnet.main-public-1.id, aws_subnet.main-public-2.id]
+resource "aws_lb" "ecs_alb" {
+  name               = "ecs-alb"
+  internal           = false
+  load_balancer_type = "application"
   security_groups = [aws_security_group.myapp-elb-securitygroup.id]
+  subnets = [aws_subnet.main-public-1.id, aws_subnet.main-public-2.id]
 
   tags = {
-    Name = "myapp-elb"
+    Name = "ecs-alb"
   }
+}
+
+resource "aws_lb_listener" "ecs_alb_listener" {
+  load_balancer_arn = aws_lb.ecs_alb.arn
+  port              = 3000
+  protocol          = "HTTP"
+
+  default_action {
+   type             = "forward"
+   target_group_arn = aws_lb_target_group.ecs_tg.arn
+ }
+}
+
+resource "aws_lb_target_group" "ecs_tg" {
+ name        = "ecs-target-group"
+ port        = 3000
+ protocol    = "HTTP"
+ vpc_id      = aws_vpc.main.id
+
+ health_check {
+   path = "/"
+ }
 }
 
 resource "aws_ecs_service" "myapp_service" {
@@ -41,10 +45,14 @@ resource "aws_ecs_service" "myapp_service" {
   task_definition = aws_ecs_task_definition.ecs_task_definition.arn
   desired_count = 1
   iam_role = aws_iam_role.ecs-service-role.arn
-  depends_on = [ aws_iam_policy_attachment.ecs-service-attach ]
+  depends_on = [aws_iam_policy_attachment.ecs-service-attach]
 
+  capacity_provider_strategy {
+    capacity_provider = aws_ecs_capacity_provider.test.name
+    weight = 100
+  }
   load_balancer {
-    elb_name = aws_elb.myapp-elb.name
+    target_group_arn = aws_lb_target_group.ecs_tg.arn
     container_port = 3000
     container_name = "myapp"
   }

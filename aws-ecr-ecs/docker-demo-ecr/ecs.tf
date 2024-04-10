@@ -24,10 +24,37 @@ resource "aws_autoscaling_group" "name" {
   vpc_zone_identifier = [aws_subnet.main-public-1.id, aws_subnet.main-public-2.id]
   launch_configuration = aws_launch_configuration.ecs-launchconfig.name
   min_size = 1
-  max_size = 1
+  max_size = 2
+  desired_capacity = 1
   tag {
-    key                 = "Name"
-    value               = "ecs-ec2-container"
+    key                 = "AmazonECSManaged"
+    value               = true
     propagate_at_launch = true
+  }
+}
+
+resource "aws_ecs_capacity_provider" "test" {
+  name = "capacity-provider-asg"
+  auto_scaling_group_provider {
+    auto_scaling_group_arn = aws_autoscaling_group.name.arn
+
+    managed_scaling {
+     maximum_scaling_step_size = 1000
+     minimum_scaling_step_size = 1
+     status                    = "ENABLED"
+     target_capacity           = 3
+   }
+   
+  }
+}
+
+resource "aws_ecs_cluster_capacity_providers" "example" {
+  capacity_providers = [aws_ecs_capacity_provider.test.name]
+  cluster_name = aws_ecs_cluster.ecs.name
+
+  default_capacity_provider_strategy {
+    base = 1
+    capacity_provider = aws_ecs_capacity_provider.test.name
+    weight = 100
   }
 }
